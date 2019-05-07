@@ -8,6 +8,7 @@
         xmlns:localization="clr-namespace:NETworkManager.Resources.Localization"
         xmlns:networkManagerControls="clr-namespace:NETworkManager.Controls"
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+        xmlns:wfi="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
         mah:DialogParticipation.Register="{Binding}"
         mc:Ignorable="d" Loaded="UserControl_Loaded" d:DataContext="{d:DesignInstance networkManagerControls:PuTTYControl}">
     <UserControl.Resources>
@@ -17,9 +18,10 @@
         <converters:BooleanToVisibilityCollapsedConverter x:Key="BooleanToVisibilityCollapsedConverter" />
     </UserControl.Resources>
     <Grid SizeChanged="WindowGrid_SizeChanged">
-        <WindowsFormsHost Visibility="{Binding IsConnected, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">  
+        <!-- WindowsFormsHost is qualified with a namespace to work around https://github.com/dotnet/core/issues/2085 -->
+        <wfi:WindowsFormsHost Visibility="{Binding IsConnected, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">  
             <windowsForms:Panel x:Name="WindowHost" />
-        </WindowsFormsHost>
+        </wfi:WindowsFormsHost>
         <Grid VerticalAlignment="Center" HorizontalAlignment="Center" TextBlock.TextAlignment="Center" Visibility="{Binding IsConnected, Converter={StaticResource BooleanReverseToVisibilityCollapsedConverter}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />

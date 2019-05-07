@@ -8,6 +8,7 @@
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:localization ="clr-namespace:NETworkManager.Resources.Localization"
         xmlns:networkManagerControls="clr-namespace:NETworkManager.Controls"
+        xmlns:wfi="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"             
         mc:Ignorable="d" Loaded="UserControl_Loaded" d:DataContext="{d:DesignInstance networkManagerControls:RemoteDesktopControl}">
     <UserControl.Resources>
         <converters:BooleanReverseConverter x:Key="BooleanReverseConverter" />
@@ -15,8 +16,9 @@
         <converters:BooleanReverseToVisibilityHiddenConverter x:Key="BooleanReverseToVisibilityHiddenConverter" />
         <converters:BooleanToVisibilityCollapsedConverter x:Key="BooleanToVisibilityCollapsedConverter" />
     </UserControl.Resources>
-    <Grid x:Name="RdpGrid" SizeChanged="RdpGrid_SizeChanged">
-        <WindowsFormsHost MaxWidth="{Binding RdpClientWidth, Mode=OneWay}" MaxHeight="{Binding RdpClientHeight, Mode=OneWay}">
+    <Grid x:Name="RdpGrid" SizeChanged="WindowGrid_SizeChanged">
+        <!-- WindowsFormsHost is qualified with a namespace to work around https://github.com/dotnet/core/issues/2085 -->        
+        <wfi:WindowsFormsHost MaxWidth="{Binding RdpClientWidth, Mode=OneWay}" MaxHeight="{Binding RdpClientHeight, Mode=OneWay}">
             <WindowsFormsHost.Style>
                 <Style TargetType="{x:Type WindowsFormsHost}">
                     <Style.Triggers>
@@ -30,7 +32,7 @@
                 </Style>
             </WindowsFormsHost.Style>
             <mstsc:AxMsRdpClient9NotSafeForScripting x:Name="RdpClient" />
-        </WindowsFormsHost>
+        </wfi:WindowsFormsHost>
         <Grid VerticalAlignment="Center" HorizontalAlignment="Center" TextBlock.TextAlignment="Center" Visibility="{Binding IsConnected, Converter={StaticResource BooleanReverseToVisibilityCollapsedConverter}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
