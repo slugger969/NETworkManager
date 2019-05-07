@@ -1,5 +1,9 @@
-<div align="center">  
-  <img alt="NETworkManager" src="NETworkManager.svg" height="128" width="128" />
+<div align="center">
+:warning: This branch is not maintained (source from 07.05.2019) and is just an example of how to migrate a WPF application from .NET 4.x to .NET Core 3 ([Video](https://www.youtube.com/watch?v=zbsf7e9xm3Y)). Many thanks to @mjrousos for the contribution :warning:
+</div>
+
+<div align="center">
+    <img alt="NETworkManager" src="NETworkManager.svg" height="128" width="128" />
   <h1>NETworkManager</h1>  
   <p>A powerful tool for managing networks and troubleshoot network problems!</p>
   <p>   
