@@ -1,1 +1,1 @@
-:warning: This branch is not maintained (source from 07.05.2019) and is just an example of how to migrate a WPF application from .NET 4.x to .NET Core 3 ([Video](https://www.youtube.com/watch?v=zbsf7e9xm3Y)). Many thanks to @mjrousos for the contribution :warning:
+:warning: This branch is not maintained (source from 07.05.2019) and is just an example of how to migrate a WPF application from .NET 4.x to .NET Core 3 ([Video](https://www.youtube.com/watch?v=zbsf7e9xm3Y)). Many thanks to @mjrousos for the contribution. :warning:
