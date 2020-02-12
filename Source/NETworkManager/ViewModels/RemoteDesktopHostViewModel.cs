@@ -13,8 +13,8 @@ using System.Diagnostics;
 using NETworkManager.Utilities;
 using System.Windows;
 using NETworkManager.Models.RemoteDesktop;
-using NETworkManager.Models.EventSystem;
 using NETworkManager.Models.Profile;
+using System.Windows.Threading;
 
 namespace NETworkManager.ViewModels
 {
@@ -22,25 +22,12 @@ namespace NETworkManager.ViewModels
     {
         #region Variables
         private readonly IDialogCoordinator _dialogCoordinator;
+        private readonly DispatcherTimer _searchDispatcherTimer = new DispatcherTimer();
 
         public IInterTabClient InterTabClient { get; }
         public ObservableCollection<DragablzTabItem> TabItems { get; }
 
         private readonly bool _isLoading;
-
-        private bool _isRDP8Dot1Available;
-        public bool IsRDP8Dot1Available
-        {
-            get => _isRDP8Dot1Available;
-            set
-            {
-                if (value == _isRDP8Dot1Available)
-                    return;
-
-                _isRDP8Dot1Available = value;
-                OnPropertyChanged();
-            }
-        }
 
         private int _selectedTabIndex;
         public int SelectedTabIndex
@@ -84,8 +71,22 @@ namespace NETworkManager.ViewModels
 
                 _search = value;
 
-                RefreshProfiles();
+                StartDelayedSearch();
 
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _isSearching;
+        public bool IsSearching
+        {
+            get => _isSearching;
+            set
+            {
+                if (value == _isSearching)
+                    return;
+
+                _isSearching = value;
                 OnPropertyChanged();
             }
         }
@@ -144,43 +145,39 @@ namespace NETworkManager.ViewModels
 
             _dialogCoordinator = instance;
 
-            // Check if RDP 8.1 is available
-            IsRDP8Dot1Available = Models.RemoteDesktop.RemoteDesktop.IsRDP8Dot1Available;
+            InterTabClient = new DragablzInterTabClient(ApplicationViewManager.Name.RemoteDesktop);
 
-            if (IsRDP8Dot1Available)
+            TabItems = new ObservableCollection<DragablzTabItem>();
+
+            Profiles = new CollectionViewSource { Source = ProfileManager.Profiles }.View;
+            Profiles.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ProfileInfo.Group)));
+            Profiles.SortDescriptions.Add(new SortDescription(nameof(ProfileInfo.Group), ListSortDirection.Ascending));
+            Profiles.SortDescriptions.Add(new SortDescription(nameof(ProfileInfo.Name), ListSortDirection.Ascending));
+            Profiles.Filter = o =>
             {
-                InterTabClient = new DragablzInterTabClient(ApplicationViewManager.Name.RemoteDesktop);
+                if (!(o is ProfileInfo info))
+                    return false;
 
-                TabItems = new ObservableCollection<DragablzTabItem>();
+                if (string.IsNullOrEmpty(Search))
+                    return info.RemoteDesktop_Enabled;
 
-                Profiles = new CollectionViewSource { Source = ProfileManager.Profiles }.View;
-                Profiles.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ProfileInfo.Group)));
-                Profiles.SortDescriptions.Add(new SortDescription(nameof(ProfileInfo.Group), ListSortDirection.Ascending));
-                Profiles.SortDescriptions.Add(new SortDescription(nameof(ProfileInfo.Name), ListSortDirection.Ascending));
-                Profiles.Filter = o =>
-                {
-                    if (!(o is ProfileInfo info))
-                        return false;
+                var search = Search.Trim();
 
-                    if (string.IsNullOrEmpty(Search))
-                        return info.RemoteDesktop_Enabled;
+                // Search by: Tag=xxx (exact match, ignore case)
+                if (search.StartsWith(ProfileManager.TagIdentifier, StringComparison.OrdinalIgnoreCase))
+                    return !string.IsNullOrEmpty(info.Tags) && info.RemoteDesktop_Enabled && info.Tags.Replace(" ", "").Split(';').Any(str => search.Substring(ProfileManager.TagIdentifier.Length, search.Length - ProfileManager.TagIdentifier.Length).Equals(str, StringComparison.OrdinalIgnoreCase));
 
-                    var search = Search.Trim();
+                // Search by: Name, RemoteDesktop_Host
+                return info.RemoteDesktop_Enabled && (info.Name.IndexOf(search, StringComparison.OrdinalIgnoreCase) > -1 || info.RemoteDesktop_Host.IndexOf(search, StringComparison.OrdinalIgnoreCase) > -1);
+            };
 
-                    // Search by: Tag=xxx (exact match, ignore case)
-                    if (search.StartsWith(ProfileManager.TagIdentifier, StringComparison.OrdinalIgnoreCase))
-                        return !string.IsNullOrEmpty(info.Tags) && info.RemoteDesktop_Enabled && info.Tags.Replace(" ", "").Split(';').Any(str => search.Substring(ProfileManager.TagIdentifier.Length, search.Length - ProfileManager.TagIdentifier.Length).Equals(str, StringComparison.OrdinalIgnoreCase));
+            // This will select the first entry as selected item...
+            SelectedProfile = Profiles.SourceCollection.Cast<ProfileInfo>().Where(x => x.RemoteDesktop_Enabled).OrderBy(x => x.Group).ThenBy(x => x.Name).FirstOrDefault();
 
-                    // Search by: Name, RemoteDesktop_Host
-                    return info.RemoteDesktop_Enabled && (info.Name.IndexOf(search, StringComparison.OrdinalIgnoreCase) > -1 || info.RemoteDesktop_Host.IndexOf(search, StringComparison.OrdinalIgnoreCase) > -1);
-                };
+            _searchDispatcherTimer.Interval = GlobalStaticConfiguration.SearchDispatcherTimerTimeSpan;
+            _searchDispatcherTimer.Tick += SearchDispatcherTimer_Tick;
 
-                // This will select the first entry as selected item...
-                SelectedProfile = Profiles.SourceCollection.Cast<ProfileInfo>().Where(x => x.RemoteDesktop_Enabled).OrderBy(x => x.Group).ThenBy(x => x.Name).FirstOrDefault();
-
-
-                LoadSettings();
-            }
+            LoadSettings();
 
             _isLoading = false;
         }
@@ -196,9 +193,7 @@ namespace NETworkManager.ViewModels
         #endregion
 
         #region ICommand & Actions        
-        public ICommand ConnectCommand => new RelayCommand(p => ConnectAction(), Connect_CanExecute);
-
-        private bool Connect_CanExecute(object parameter) => IsRDP8Dot1Available;
+        public ICommand ConnectCommand => new RelayCommand(p => ConnectAction());
 
         private void ConnectAction()
         {
@@ -353,7 +348,7 @@ namespace NETworkManager.ViewModels
         private static void CloseItemAction(ItemActionCallbackArgs<TabablzControl> args)
         {
             ((args.DragablzItem.Content as DragablzTabItem)?.View as RemoteDesktopControl)?.CloseTab();
-        }               
+        }
         #endregion
 
         #region Methods
@@ -487,6 +482,30 @@ namespace NETworkManager.ViewModels
             list.ForEach(x => SettingsManager.Current.RemoteDesktop_HostHistory.Add(x));
         }
 
+        private void StartDelayedSearch()
+        {
+            if (!IsSearching)
+            {
+                IsSearching = true;
+
+                _searchDispatcherTimer.Start();
+            }
+            else
+            {
+                _searchDispatcherTimer.Stop();
+                _searchDispatcherTimer.Start();
+            }
+        }
+
+        private void StopDelayedSearch()
+        {
+            _searchDispatcherTimer.Stop();
+
+            RefreshProfiles();
+
+            IsSearching = false;
+        }
+
         private void ResizeProfile(bool dueToChangedSize)
         {
             _canProfileWidthChange = false;
@@ -534,6 +553,13 @@ namespace NETworkManager.ViewModels
         public void OnProfileDialogClose()
         {
             ConfigurationManager.Current.FixAirspace = false;
+        }
+        #endregion
+
+        #region Event
+        private void SearchDispatcherTimer_Tick(object sender, EventArgs e)
+        {
+            StopDelayedSearch();
         }
         #endregion
     }

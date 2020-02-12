@@ -1942,24 +1942,6 @@ namespace NETworkManager.Resources.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to How to install RDP 8.1 on Windows 7/Server 2008 R2.
-        /// </summary>
-        public static string DocumentationTitle_00001 {
-            get {
-                return ResourceManager.GetString("DocumentationTitle_00001", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to How to create a custom theme and accent?.
-        /// </summary>
-        public static string DocumentationTitle_00002 {
-            get {
-                return ResourceManager.GetString("DocumentationTitle_00002", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Domain.
         /// </summary>
         public static string Domain {
@@ -3020,15 +3002,6 @@ namespace NETworkManager.Resources.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Ignore certificate errors.
-        /// </summary>
-        public static string IgnoreCertificateErrors {
-            get {
-                return ResourceManager.GetString("IgnoreCertificateErrors", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Import.
         /// </summary>
         public static string Import {
@@ -3079,15 +3052,6 @@ namespace NETworkManager.Resources.Localization {
         public static string InheritHostFromDefault {
             get {
                 return ResourceManager.GetString("InheritHostFromDefault", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to You must install the Remote Desktop Protocol (RDP) version 8.1 on your system to use the Remote Desktop functionality!.
-        /// </summary>
-        public static string InstallRDP8dot1Message {
-            get {
-                return ResourceManager.GetString("InstallRDP8dot1Message", resourceCulture);
             }
         }
         
@@ -3565,6 +3529,15 @@ namespace NETworkManager.Resources.Localization {
         public static string MessageSize {
             get {
                 return ResourceManager.GetString("MessageSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Microsoft.Windows.SDK.Contracts is required for this feature but not available on this system (e.g. on Windows Server)..
+        /// </summary>
+        public static string MicrosoftWindowsSDKContractsIsNotAvailable {
+            get {
+                return ResourceManager.GetString("MicrosoftWindowsSDKContractsIsNotAvailable", resourceCulture);
             }
         }
         
@@ -5544,7 +5517,7 @@ namespace NETworkManager.Resources.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Restart as Admininistrator.
+        ///   Looks up a localized string similar to Restart as Administrator.
         /// </summary>
         public static string RestartAsAdmin {
             get {
@@ -6549,15 +6522,6 @@ namespace NETworkManager.Resources.Localization {
         public static string TheSettingsLocationIsNotAffected {
             get {
                 return ResourceManager.GetString("TheSettingsLocationIsNotAffected", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to This feature is only available in Windows 10 / Server 2016 or later!.
-        /// </summary>
-        public static string ThisFeatureIsOnlyAvailableInWindows10Server2016OrLater {
-            get {
-                return ResourceManager.GetString("ThisFeatureIsOnlyAvailableInWindows10Server2016OrLater", resourceCulture);
             }
         }
         

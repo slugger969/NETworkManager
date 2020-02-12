@@ -12,6 +12,7 @@ using System.Collections.ObjectModel;
 using NETworkManager.Views;
 using System.Net;
 using NETworkManager.Models.Profile;
+using System.Windows.Threading;
 
 namespace NETworkManager.ViewModels
 {
@@ -19,7 +20,7 @@ namespace NETworkManager.ViewModels
     {
         #region  Variables 
         private readonly IDialogCoordinator _dialogCoordinator;
-
+        private readonly DispatcherTimer _searchDispatcherTimer = new DispatcherTimer();
 
         private readonly bool _isLoading;
 
@@ -140,8 +141,22 @@ namespace NETworkManager.ViewModels
 
                 _search = value;
 
-                RefreshProfiles();
+                StartDelayedSearch();
 
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _isSearching;
+        public bool IsSearching
+        {
+            get => _isSearching;
+            set
+            {
+                if (value == _isSearching)
+                    return;
+
+                _isSearching = value;
                 OnPropertyChanged();
             }
         }
@@ -232,6 +247,9 @@ namespace NETworkManager.ViewModels
             // This will select the first entry as selected item...
             SelectedProfile = Profiles.SourceCollection.Cast<ProfileInfo>().Where(x => x.PingMonitor_Enabled).OrderBy(x => x.Group).ThenBy(x => x.Name).FirstOrDefault();
 
+            _searchDispatcherTimer.Interval = GlobalStaticConfiguration.SearchDispatcherTimerTimeSpan;
+            _searchDispatcherTimer.Tick += SearchDispatcherTimer_Tick;
+
             LoadSettings();
 
             _isLoading = false;
@@ -316,8 +334,7 @@ namespace NETworkManager.ViewModels
         #endregion
 
         #region Methods
-
-        private async void AddHost(string host)
+        public async void AddHost(string host)
         {
             IsWorking = true;
             DisplayStatusMessage = false;
@@ -336,7 +353,7 @@ namespace NETworkManager.ViewModels
                 hostname = host;
                 ipAddress = await DnsLookupHelper.ResolveIPAddress(host);
             }
-                       
+
             if (ipAddress != null)
             {
                 Hosts.Add(new PingMonitorHostView(_hostId, RemoveHost, new PingMonitorOptions(hostname, ipAddress)));
@@ -378,6 +395,30 @@ namespace NETworkManager.ViewModels
 
             // Fill with the new items
             list.ForEach(x => SettingsManager.Current.PingMonitor_HostHistory.Add(x));
+        }
+
+        private void StartDelayedSearch()
+        {
+            if (!IsSearching)
+            {
+                IsSearching = true;
+
+                _searchDispatcherTimer.Start();
+            }
+            else
+            {
+                _searchDispatcherTimer.Stop();
+                _searchDispatcherTimer.Start();
+            }
+        }
+
+        private void StopDelayedSearch()
+        {
+            _searchDispatcherTimer.Stop();
+
+            RefreshProfiles();
+
+            IsSearching = false;
         }
 
         private void ResizeProfile(bool dueToChangedSize)
@@ -427,6 +468,13 @@ namespace NETworkManager.ViewModels
         public void OnProfileDialogClose()
         {
 
+        }
+        #endregion
+
+        #region Event
+        private void SearchDispatcherTimer_Tick(object sender, EventArgs e)
+        {
+            StopDelayedSearch();
         }
         #endregion
     }

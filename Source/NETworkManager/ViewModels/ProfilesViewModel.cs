@@ -1,5 +1,4 @@
-﻿using NETworkManager.Models.Settings;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 using System.ComponentModel;
 using System.Windows.Data;
 using MahApps.Metro.Controls.Dialogs;
@@ -62,8 +61,22 @@ namespace NETworkManager.ViewModels
 
                 _search = value;
 
-                _searchDispatcherTimer.Start();
+                StartDelayedSearch();
 
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _isSearching;
+        public bool IsSearching
+        {
+            get => _isSearching;
+            set
+            {
+                if (value == _isSearching)
+                    return;
+
+                _isSearching = value;
                 OnPropertyChanged();
             }
         }
@@ -262,7 +275,7 @@ namespace NETworkManager.ViewModels
 
                 ProfileManager.RenameGroup(instance.OldGroup, instance.Group);
 
-                Refresh();
+                RefreshProfiles();
             }, instance =>
             {
                 _dialogCoordinator.HideMetroDialogAsync(this, customDialog);
@@ -303,19 +316,40 @@ namespace NETworkManager.ViewModels
             await _dialogCoordinator.ShowMetroDialogAsync(this, customDialog);
         }
 
-        public void Refresh()
+        private void StartDelayedSearch()
         {
-            // Refresh profiles
-            Profiles.Refresh();
+            if (!IsSearching)
+            {
+                IsSearching = true;
+
+                _searchDispatcherTimer.Start();
+            }
+            else
+            {
+                _searchDispatcherTimer.Stop();
+                _searchDispatcherTimer.Start();
+            }
         }
+
+        private void StopDelayedSearch()
+        {
+            _searchDispatcherTimer.Stop();
+
+            RefreshProfiles();
+
+            IsSearching = false;
+        }
+
+        public void RefreshProfiles()
+        {
+            Profiles.Refresh();
+        }        
         #endregion
 
         #region Event
         private void SearchDispatcherTimer_Tick(object sender, EventArgs e)
         {
-            _searchDispatcherTimer.Stop();
-
-            Profiles.Refresh();
+            StopDelayedSearch();
         }
         #endregion
     }

@@ -897,9 +897,6 @@
   <data name="InheritHostFromDefault" xml:space="preserve">
     <value>Inherit host from default</value>
   </data>
-  <data name="InstallRDP8dot1Message" xml:space="preserve">
-    <value>You must install the Remote Desktop Protocol (RDP) version 8.1 on your system to use the Remote Desktop functionality!</value>
-  </data>
   <data name="IPRange" xml:space="preserve">
     <value>IP range</value>
   </data>
@@ -1302,12 +1299,6 @@ If you click "Move &amp; Restart", the remaining files will be copied and the ap
   </data>
   <data name="DeleteTable" xml:space="preserve">
     <value>Delete table</value>
-  </data>
-  <data name="DocumentationTitle_00001" xml:space="preserve">
-    <value>How to install RDP 8.1 on Windows 7/Server 2008 R2</value>
-  </data>
-  <data name="DocumentationTitle_00002" xml:space="preserve">
-    <value>How to create a custom theme and accent?</value>
   </data>
   <data name="EnterLocationDots" xml:space="preserve">
     <value>Enter location...</value>
@@ -1945,9 +1936,6 @@ If you click "Move &amp; Restart", the remaining files will be copied and the ap
   <data name="FilePath" xml:space="preserve">
     <value>File path</value>
   </data>
-  <data name="ThisFeatureIsOnlyAvailableInWindows10Server2016OrLater" xml:space="preserve">
-    <value>This feature is only available in Windows 10 / Server 2016 or later!</value>
-  </data>
   <data name="OverrideDefaultSettings" xml:space="preserve">
     <value>Override default settings</value>
   </data>
@@ -2519,7 +2507,7 @@ URL: https://github.com/BornToBeRoot/NETworkManager/tree/master/Documentation</v
     <value>LLDP / CDP</value>
   </data>
   <data name="RestartAsAdmin" xml:space="preserve">
-    <value>Restart as Admininistrator</value>
+    <value>Restart as Administrator</value>
   </data>
   <data name="NetworkPacketsCaptureAdminMessage" xml:space="preserve">
     <value>To analyze network packets, the application must be started with elevated rights!</value>
@@ -2581,13 +2569,13 @@ URL: https://github.com/BornToBeRoot/NETworkManager/tree/master/Documentation</v
   <data name="Reload" xml:space="preserve">
     <value>Reload</value>
   </data>
-  <data name="IgnoreCertificateErrors" xml:space="preserve">
-    <value>Ignore certificate errors</value>
-  </data>
   <data name="Browser" xml:space="preserve">
     <value>Browser</value>
   </data>
   <data name="WebViewControlCertificateIsInvalidMessage" xml:space="preserve">
     <value>The WebView control (Microsoft Edge) cannot connect to websites with an invalid certificate!</value>
+  </data>
+  <data name="MicrosoftWindowsSDKContractsIsNotAvailable" xml:space="preserve">
+    <value>Microsoft.Windows.SDK.Contracts is required for this feature but not available on this system (e.g. on Windows Server).</value>
   </data>
 </root>
